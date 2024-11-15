@@ -6,7 +6,6 @@ pub fn build(b: *std.Build) void {
 
     const libjpeg_dep = b.dependency("libjpeg", .{});
 
-    const t = target.result;
     const jconfig_h = b.addConfigHeader(.{
         .style = .{ .cmake = libjpeg_dep.path("jconfig.h.in") },
         .include_path = "jconfig.h",
@@ -30,7 +29,7 @@ pub fn build(b: *std.Build) void {
         .THREAD_LOCAL = "__thread",
         .CMAKE_PROJECT_NAME = "libjpeg-turbo",
         .VERSION = "3.0.3",
-        .SIZE_T = t.cTypeByteSize(.longlong), // This is wrong
+        .SIZE_T = @sizeOf(usize),
         .HAVE_BUILTIN_CTZL = 1,
         .HAVE_INTRIN_H = null,
         .C_ARITH_CODING_SUPPORTED = 1,
