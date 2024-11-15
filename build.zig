@@ -15,7 +15,7 @@ pub fn build(b: *std.Build) void {
         .LIBJPEG_TURBO_VERSION_NUMBER = 3000003,
         .C_ARITH_CODING_SUPPORTED = 1,
         .D_ARITH_CODING_SUPPORTED = 1,
-        .WITH_SIMD = 0,
+        .WITH_SIMD = null,
         .RIGHT_SHIFT_IS_UNSIGNED = null,
     });
 
@@ -34,7 +34,7 @@ pub fn build(b: *std.Build) void {
         .HAVE_INTRIN_H = null,
         .C_ARITH_CODING_SUPPORTED = 1,
         .D_ARITH_CODING_SUPPORTED = 1,
-        .WITH_SIMD = 0,
+        .WITH_SIMD = null,
     });
 
     const lib = b.addStaticLibrary(.{
