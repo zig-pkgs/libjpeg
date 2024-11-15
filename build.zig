@@ -37,37 +37,58 @@ pub fn build(b: *std.Build) void {
         .WITH_SIMD = null,
     });
 
-    const lib = b.addStaticLibrary(.{
+    const jpeg16 = b.addStaticLibrary(.{
+        .name = "jpeg16",
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    jpeg16.addConfigHeader(jconfig_h);
+    jpeg16.addConfigHeader(jconfigint_h);
+    jpeg16.addCSourceFiles(.{
+        .root = libjpeg_dep.path("."),
+        .files = &jpeg16_sources,
+        .flags = &.{},
+    });
+    jpeg16.defineCMacro("BITS_IN_JSAMPLE", "16");
+    jpeg16.addIncludePath(b.path("src"));
+    jpeg16.addIncludePath(libjpeg_dep.path("."));
+    b.installArtifact(jpeg16);
+
+    const jpeg12 = b.addStaticLibrary(.{
+        .name = "jpeg12",
+        .target = target,
+        .optimize = optimize,
+        .link_libc = true,
+    });
+    jpeg12.addConfigHeader(jconfig_h);
+    jpeg12.addConfigHeader(jconfigint_h);
+    jpeg12.addCSourceFiles(.{
+        .root = libjpeg_dep.path("."),
+        .files = &jpeg12_sources,
+        .flags = &.{},
+    });
+    jpeg12.defineCMacro("BITS_IN_JSAMPLE", "12");
+    jpeg12.addIncludePath(b.path("src"));
+    jpeg12.addIncludePath(libjpeg_dep.path("."));
+    b.installArtifact(jpeg12);
+
+    const jpeg = b.addStaticLibrary(.{
         .name = "jpeg",
         .target = target,
         .optimize = optimize,
         .link_libc = true,
     });
-    lib.addConfigHeader(jconfig_h);
-    lib.addConfigHeader(jconfigint_h);
-    lib.addCSourceFiles(.{
-        .root = libjpeg_dep.path("."),
-        .files = &jpeg16_sources,
-        .flags = &.{},
-    });
-    lib.addCSourceFiles(.{
-        .root = libjpeg_dep.path("."),
-        .files = &jpeg12_sources,
-        .flags = &.{},
-    });
-    lib.addCSourceFiles(.{
+    jpeg.addConfigHeader(jconfig_h);
+    jpeg.addConfigHeader(jconfigint_h);
+    jpeg.addCSourceFiles(.{
         .root = libjpeg_dep.path("."),
         .files = &jpeg_sources,
         .flags = &.{},
     });
-    lib.addCSourceFiles(.{
-        .root = libjpeg_dep.path("."),
-        .files = &arith_enc_dec,
-        .flags = &.{},
-    });
-    lib.addIncludePath(b.path("src"));
-    lib.addIncludePath(libjpeg_dep.path("."));
-    b.installArtifact(lib);
+    jpeg.addIncludePath(b.path("src"));
+    jpeg.addIncludePath(libjpeg_dep.path("."));
+    b.installArtifact(jpeg);
 
     const lib_unit_tests = b.addTest(.{
         .root_source_file = b.path("src/root.zig"),
@@ -97,6 +118,7 @@ const jpeg16_sources = [_][]const u8{
     "jdsample.c",
     "jutils.c",
 };
+
 const jpeg12_sources = [_][]const u8{
     "jccoefct.c",
     "jcdctmgr.c",
@@ -111,6 +133,12 @@ const jpeg12_sources = [_][]const u8{
     "jidctred.c",
     "jquant1.c",
     "jquant2.c",
+} ++ jpeg16_sources;
+
+const arith_enc_dec = [_][]const u8{
+    "jaricom.c",
+    "jcarith.c",
+    "jdarith.c",
 };
 
 const jpeg_sources = [_][]const u8{
@@ -141,10 +169,4 @@ const jpeg_sources = [_][]const u8{
     "jmemmgr.c",
     "jmemnobs.c",
     "jpeg_nbits.c",
-};
-
-const arith_enc_dec = [_][]const u8{
-    "jaricom.c",
-    "jcarith.c",
-    "jdarith.c",
-};
+} ++ jpeg12_sources ++ arith_enc_dec;
