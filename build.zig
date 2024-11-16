@@ -88,7 +88,9 @@ pub fn build(b: *std.Build) void {
     });
     jpeg.addIncludePath(b.path("src"));
     jpeg.addIncludePath(libjpeg_dep.path("."));
-    jpeg.installHeader(libjpeg_dep.path("jpeglib.h"), "jpeglib.h");
+    jpeg.installHeadersDirectory(libjpeg_dep.path("."), "", .{
+        .include_extensions = &.{".h"},
+    });
     jpeg.installConfigHeader(jconfig_h);
     b.installArtifact(jpeg);
 
